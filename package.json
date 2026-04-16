@@ -1,0 +1,11 @@
+{
+  "name": "@company/calendar-booking-spec",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/openapi": "latest",
+    "@typespec/openapi3": "latest"
+  }
+}
