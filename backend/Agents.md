@@ -30,16 +30,45 @@ npx tsc --noEmit       # Type-check without emitting
 
 ```
 src/
-  main.ts              # Bootstrap, port from PORT env
-  app.module.ts         # Root module
-  app.controller.ts     # Root controller
-  app.service.ts        # Root service
+  main.ts                          # Bootstrap, port from PORT env
+  app.module.ts                    # Root module (imports: EventTypesModule, BookingsModule, SlotsModule)
+  app.controller.ts                # Root controller
+  app.service.ts                   # Root service
   entities/
-    owner.entity.ts     # Owner (id, name, email)
-    event-type.entity.ts # EventType (id, name, description, durationMinutes, createdAt) + relations
-    slot.entity.ts      # Slot (id, startTime, endTime, eventTypeId, isAvailable) + relation
-    booking.entity.ts   # Booking (id, eventTypeId, startTime, endTime, guestName, guestEmail, status, createdAt) + relation + BookingStatus enum
-    index.ts            # Barrel exports
+    owner.entity.ts                # Owner (id, name, email)
+    event-type.entity.ts           # EventType (id, name, description, durationMinutes, createdAt) + relations
+    slot.entity.ts                 # Slot (id, startTime, endTime, eventTypeId, isAvailable) + relation
+    booking.entity.ts              # Booking (id, eventTypeId, startTime, endTime, guestName, guestEmail, status, createdAt) + relation + BookingStatus enum
+    index.ts                       # Barrel exports
+  event-types/
+    event-types.module.ts          # Module (TypeOrmModule.forFeature([EventType]))
+    event-types.controller.ts      # Admin CRUD + Public read endpoints
+    event-types.service.ts         # Business logic: list, get, create, update, delete
+    dto/
+      request/
+        create-event-type.request.ts   # name, description, durationMinutes
+        update-event-type.request.ts   # name?, description?, durationMinutes?
+      response/
+        event-type.response.ts         # id, name, description, durationMinutes, createdAt
+        event-type-list.response.ts    # items: EventTypeResponse[]
+  bookings/
+    bookings.module.ts             # Module (TypeOrmModule.forFeature([Booking]), imports EventTypesModule)
+    bookings.controller.ts         # Admin list/get/cancel + Public create/get endpoints
+    bookings.service.ts            # Business logic: list, get, create (auto-calculates endTime), cancel
+    dto/
+      request/
+        create-booking.request.ts      # eventTypeId, startTime, guestName, guestEmail
+      response/
+        booking.response.ts            # id, eventTypeId, eventType (embedded), startTime, endTime, guestName, guestEmail, status, createdAt
+        booking-list.response.ts       # items: BookingResponse[], totalCount
+  slots/
+    slots.module.ts                # Module (TypeOrmModule.forFeature([Slot]))
+    slots.controller.ts            # Public list endpoint
+    slots.service.ts               # Business logic: list (filter by eventTypeId, fromDate, toDate)
+    dto/
+      response/
+        slot.response.ts               # startTime, endTime, isAvailable
+        available-slots.response.ts    # eventTypeId, slots: SlotResponse[]
 ```
 
 ## Entity Relationships
@@ -99,16 +128,30 @@ src/
 - UUID primary keys via `@PrimaryGeneratedColumn('uuid')`
 - Timestamps use `@CreateDateColumn({ type: 'timestamptz' })`
 - Barrel exports in `index.ts`
-- NestJS module structure: controller + service + module per feature
+- NestJS module structure: controller + service + module per domain
+- DTOs split into `dto/request/` and `dto/response/` subdirectories
+- DTO file naming: `<action>-<entity>.request.ts` / `<entity>.response.ts`
+- Controllers handle both admin (`/api/admin/...`) and public (`/api/public/...`) routes in a single controller per domain
+- Services use TypeORM repositories injected via `@InjectRepository`
+- Entity-to-response mapping done via private `toResponse()` methods in services
+- Cross-module dependencies: BookingsModule imports EventTypesModule (for durationMinutes lookup on create)
 
-## What Needs to Be Built
+## Implementation Status
 
-The entities are complete. The following still need implementation:
+### Done
 
-1. **TypeORM configuration** in `AppModule` (database connection, entity registration)
-2. **Feature modules**: `EventTypeModule`, `SlotModule`, `BookingModule` (each with controller + service + module)
-3. **DTOs** with validation: `CreateEventTypeDto`, `UpdateEventTypeDto`, `CreateBookingDto`, etc.
-4. **Slot generation logic**: Compute available slots from event type duration + booking window
-5. **Conflict detection**: Prevent double-booking across event types
-6. **Error handling**: Custom exceptions matching the error codes above
-7. **Owner seed**: Predefined owner profile in database
+1. **Entities**: All TypeORM entities with relations and barrel exports
+2. **Feature modules**: `EventTypesModule`, `BookingsModule`, `SlotsModule` — each with controller, service, module, and DTOs
+3. **DTOs**: Request/response DTOs separated into `dto/request/` and `dto/response/` directories
+4. **Module registration**: All modules imported in `AppModule`
+5. **CRUD operations**: Event types (full CRUD), Bookings (create, list, get, cancel), Slots (list with filters)
+6. **Auto endTime calculation**: Bookings service calculates `endTime` from event type `durationMinutes`
+
+### Still Needs Implementation
+
+1. **TypeORM configuration** in `AppModule` (database connection, entity registration via `TypeOrmModule.forRoot()`)
+2. **DTO validation**: Add `class-validator` + `class-transformer` decorators to request DTOs and enable `ValidationPipe`
+3. **Slot generation logic**: Compute available slots from event type duration + booking window (currently reads from DB)
+4. **Conflict detection**: Prevent double-booking across event types
+5. **Error handling**: Custom NestJS exceptions matching the error codes table above
+6. **Owner seed**: Predefined owner profile in database
