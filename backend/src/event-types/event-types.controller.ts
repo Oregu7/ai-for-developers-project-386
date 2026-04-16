@@ -8,10 +8,10 @@ import {
   Param,
 } from '@nestjs/common';
 import { EventTypesService } from './event-types.service.js';
-import { CreateEventTypeRequest } from './dto/create-event-type.request.js';
-import { UpdateEventTypeRequest } from './dto/update-event-type.request.js';
-import { EventTypeResponse } from './dto/event-type.response.js';
-import { EventTypeListResponse } from './dto/event-type-list.response.js';
+import { CreateEventTypeRequest } from './dto/request/create-event-type.request.js';
+import { UpdateEventTypeRequest } from './dto/request/update-event-type.request.js';
+import { EventTypeResponse } from './dto/response/event-type.response.js';
+import { EventTypeListResponse } from './dto/response/event-type-list.response.js';
 
 @Controller()
 export class EventTypesController {

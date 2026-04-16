@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventType } from '../entities/index.js';
-import { CreateEventTypeRequest } from './dto/create-event-type.request.js';
-import { UpdateEventTypeRequest } from './dto/update-event-type.request.js';
-import { EventTypeResponse } from './dto/event-type.response.js';
-import { EventTypeListResponse } from './dto/event-type-list.response.js';
+import { CreateEventTypeRequest } from './dto/request/create-event-type.request.js';
+import { UpdateEventTypeRequest } from './dto/request/update-event-type.request.js';
+import { EventTypeResponse } from './dto/response/event-type.response.js';
+import { EventTypeListResponse } from './dto/response/event-type-list.response.js';
 
 @Injectable()
 export class EventTypesService {

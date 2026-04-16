@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Slot } from '../entities/index.js';
-import { AvailableSlotsResponse } from './dto/available-slots.response.js';
-import { SlotResponse } from './dto/slot.response.js';
+import { AvailableSlotsResponse } from './dto/response/available-slots.response.js';
+import { SlotResponse } from './dto/response/slot.response.js';
 
 @Injectable()
 export class SlotsService {

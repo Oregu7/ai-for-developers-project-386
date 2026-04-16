@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { SlotsService } from './slots.service.js';
-import { AvailableSlotsResponse } from './dto/available-slots.response.js';
+import { AvailableSlotsResponse } from './dto/response/available-slots.response.js';
 
 @Controller()
 export class SlotsController {

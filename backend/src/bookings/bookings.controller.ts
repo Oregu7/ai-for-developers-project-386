@@ -8,9 +8,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service.js';
-import { CreateBookingRequest } from './dto/create-booking.request.js';
-import { BookingResponse } from './dto/booking.response.js';
-import { BookingListResponse } from './dto/booking-list.response.js';
+import { CreateBookingRequest } from './dto/request/create-booking.request.js';
+import { BookingResponse } from './dto/response/booking.response.js';
+import { BookingListResponse } from './dto/response/booking-list.response.js';
 
 @Controller()
 export class BookingsController {

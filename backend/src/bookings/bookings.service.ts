@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Booking, BookingStatus } from '../entities/index.js';
-import { CreateBookingRequest } from './dto/create-booking.request.js';
-import { BookingResponse } from './dto/booking.response.js';
-import { BookingListResponse } from './dto/booking-list.response.js';
+import { CreateBookingRequest } from './dto/request/create-booking.request.js';
+import { BookingResponse } from './dto/response/booking.response.js';
+import { BookingListResponse } from './dto/response/booking-list.response.js';
 import { EventTypesService } from '../event-types/event-types.service.js';
 
 @Injectable()

@@ -1,5 +1,5 @@
-import { EventTypeResponse } from '../../event-types/dto/event-type.response.js';
-import { BookingStatus } from '../../entities/index.js';
+import { EventTypeResponse } from '../../../event-types/dto/response/event-type.response.js';
+import { BookingStatus } from '../../../entities/index.js';
 
 export class BookingResponse {
   id: string;
