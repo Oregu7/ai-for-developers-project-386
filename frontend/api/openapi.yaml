@@ -1,0 +1,523 @@
+openapi: 3.0.0
+info:
+  title: Calendar Booking API
+  version: 0.0.0
+tags: []
+paths:
+  /api/admin/bookings:
+    get:
+      operationId: BookingsAdmin_list
+      description: List all upcoming bookings (Owner)
+      parameters:
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/BookingListResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+  /api/admin/bookings/{id}:
+    get:
+      operationId: BookingsAdmin_get
+      description: Get booking details (Owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/BookingResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: BookingsAdmin_cancel
+      description: Cancel booking (Owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+  /api/admin/event-types:
+    get:
+      operationId: EventTypesAdmin_list
+      description: List all event types (Owner)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventTypeListResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: EventTypesAdmin_create
+      description: Create a new event type (Owner)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventTypeResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTypeCreateRequest'
+  /api/admin/event-types/{id}:
+    get:
+      operationId: EventTypesAdmin_get
+      description: Get event type by ID (Owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventTypeResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: EventTypesAdmin_update
+      description: Update event type (Owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventTypeResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTypeUpdateRequest'
+    delete:
+      operationId: EventTypesAdmin_delete
+      description: Delete event type (Owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+  /api/public/bookings:
+    post:
+      operationId: BookingsPublic_create
+      description: Create a new booking (Guest)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/BookingResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreateRequest'
+  /api/public/bookings/{id}:
+    get:
+      operationId: BookingsPublic_get
+      description: Get booking details by ID (Guest - for confirmation)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/BookingResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+  /api/public/event-types:
+    get:
+      operationId: EventTypesPublic_list
+      description: List available event types (Guest)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventTypeListResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+  /api/public/event-types/{id}:
+    get:
+      operationId: EventTypesPublic_get
+      description: Get event type details (Guest)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventTypeResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+  /api/public/slots:
+    get:
+      operationId: SlotsPublic_list
+      description: Get available slots for event type (Guest)
+      parameters:
+        - name: eventTypeId
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/AvailableSlotsResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    AvailableSlotsResponse:
+      type: object
+      required:
+        - eventTypeId
+        - slots
+      properties:
+        eventTypeId:
+          type: string
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/SlotResponse'
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - startTime
+        - endTime
+        - guestName
+        - guestEmail
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+        eventTypeId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+        status:
+          $ref: '#/components/schemas/BookingStatus'
+        createdAt:
+          type: string
+          format: date-time
+      description: Booking created by guest
+    BookingCreateRequest:
+      type: object
+      required:
+        - eventTypeId
+        - startTime
+        - guestName
+        - guestEmail
+      properties:
+        eventTypeId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+    BookingListResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookingResponse'
+        totalCount:
+          type: integer
+          format: int32
+    BookingResponse:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - eventType
+        - startTime
+        - endTime
+        - guestName
+        - guestEmail
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+        eventTypeId:
+          type: string
+        eventType:
+          $ref: '#/components/schemas/EventTypeResponse'
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+        status:
+          $ref: '#/components/schemas/BookingStatus'
+        createdAt:
+          type: string
+          format: date-time
+    BookingStatus:
+      type: string
+      enum:
+        - confirmed
+        - cancelled
+      description: Booking status
+    ErrorDetail:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+    EventType:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - durationMinutes
+        - createdAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+      description: Event type created by owner
+    EventTypeCreateRequest:
+      type: object
+      required:
+        - name
+        - description
+        - durationMinutes
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+    EventTypeListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventTypeResponse'
+    EventTypeResponse:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - durationMinutes
+        - createdAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+    EventTypeUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+    Owner:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+      description: Owner profile - single predefined calendar owner
+    Slot:
+      type: object
+      required:
+        - startTime
+        - endTime
+        - eventTypeId
+        - isAvailable
+      properties:
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        eventTypeId:
+          type: string
+        isAvailable:
+          type: boolean
+      description: Time slot for booking
+    SlotResponse:
+      type: object
+      required:
+        - startTime
+        - endTime
+        - isAvailable
+      properties:
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        isAvailable:
+          type: boolean
