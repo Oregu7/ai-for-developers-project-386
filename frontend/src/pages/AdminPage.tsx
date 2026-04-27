@@ -9,11 +9,11 @@ import { AdminEventTypesPanel } from './admin/AdminEventTypesPanel';
 
 export default function AdminPage() {
   return (
-    <div className="bg-app-gradient min-h-[calc(100vh-60px)]">
+    <div className="bg-app-gradient min-h-[calc(100vh-56px)]">
       <div className="mx-auto max-w-5xl px-6 py-10">
         <header className="mb-8">
-          <h2 className="text-3xl font-bold text-slate-900">Админка</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl font-bold text-foreground">Панель управления</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
             Управление типами событий и бронированиями
           </p>
         </header>

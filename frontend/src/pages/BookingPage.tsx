@@ -3,9 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
+import { ArrowLeftIcon, CheckIcon, ClockIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -22,20 +21,6 @@ import { cn } from '@/lib/utils';
 import type { SlotResponse } from '@/types/api';
 
 dayjs.locale('ru');
-
-interface InfoBoxProps {
-  label: string;
-  value: string;
-}
-
-function InfoBox({ label, value }: InfoBoxProps) {
-  return (
-    <div className="rounded-lg bg-slate-100 px-3 py-2.5">
-      <p className="mb-0.5 text-xs text-muted-foreground">{label}</p>
-      <p className="text-sm font-medium text-slate-900">{value}</p>
-    </div>
-  );
-}
 
 export default function BookingPage() {
   const { id } = useParams<{ id: string }>();
@@ -71,13 +56,8 @@ export default function BookingPage() {
   const slotsForDate = useMemo(() => {
     if (!selectedDate) return [];
     return slots
-      .filter(
-        (s) => dayjs(s.startTime).format('YYYY-MM-DD') === selectedDate,
-      )
-      .sort(
-        (a, b) =>
-          dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf(),
-      );
+      .filter((s) => dayjs(s.startTime).format('YYYY-MM-DD') === selectedDate)
+      .sort((a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf());
   }, [slots, selectedDate]);
 
   const selectedDateFormatted = selectedDate
@@ -88,9 +68,14 @@ export default function BookingPage() {
 
   if (eventTypeLoading) {
     return (
-      <div className="bg-app-gradient min-h-[calc(100vh-60px)]">
-        <div className="mx-auto max-w-5xl px-6 py-10">
-          <p className="text-muted-foreground">Загрузка...</p>
+      <div className="bg-app-gradient min-h-[calc(100vh-56px)]">
+        <div className="mx-auto max-w-6xl px-6 py-10">
+          <div className="h-8 w-48 animate-pulse rounded-lg bg-muted" />
+          <div className="mt-6 flex gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-64 flex-1 animate-pulse rounded-2xl bg-muted" />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -98,8 +83,8 @@ export default function BookingPage() {
 
   if (!eventType) {
     return (
-      <div className="bg-app-gradient min-h-[calc(100vh-60px)]">
-        <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="bg-app-gradient min-h-[calc(100vh-56px)]">
+        <div className="mx-auto max-w-6xl px-6 py-10">
           <p className="text-destructive">Тип события не найден.</p>
         </div>
       </div>
@@ -142,48 +127,72 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="bg-app-gradient min-h-[calc(100vh-60px)]">
+    <div className="bg-app-gradient min-h-[calc(100vh-56px)]">
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <h2 className="mb-8 text-3xl font-bold text-slate-900">
+        <button
+          type="button"
+          onClick={() => navigate('/book')}
+          className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeftIcon className="size-3.5" />
+          Назад к событиям
+        </button>
+
+        <h2 className="mb-6 text-3xl font-bold text-foreground">
           {eventType.name}
         </h2>
 
         {slotsLoading ? (
-          <p className="text-muted-foreground">Загрузка слотов...</p>
+          <div className="flex gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-64 flex-1 animate-pulse rounded-2xl bg-muted" />
+            ))}
+          </div>
         ) : (
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-            <Card className="w-full bg-white p-5 lg:w-72 lg:shrink-0">
-              <div className="mb-4 flex items-center gap-3">
+            <div className="w-full rounded-2xl border border-border/60 bg-white p-5 shadow-sm lg:w-64 lg:shrink-0">
+              <div className="mb-5 flex items-center gap-3">
                 <HostAvatar size={40} />
                 <div>
-                  <p className="font-bold text-slate-900">Tota</p>
+                  <p className="text-sm font-semibold text-foreground">Tota</p>
                   <p className="text-xs text-muted-foreground">Host</p>
                 </div>
               </div>
-              <div className="mb-3 flex items-center gap-2">
-                <p className="font-bold text-slate-900">{eventType.name}</p>
-                <Badge variant="ghost" className="bg-slate-100 text-slate-600">
-                  {eventType.durationMinutes} мин
-                </Badge>
+
+              <div className="mb-1 text-base font-semibold text-foreground">
+                {eventType.name}
               </div>
-              <p className="mb-4 text-sm text-muted-foreground">
+              <div className="mb-3 flex items-center gap-1.5">
+                <ClockIcon className="size-3.5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  {eventType.durationMinutes} минут
+                </span>
+              </div>
+              <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
                 {eventType.description}
               </p>
+
               <div className="space-y-2.5">
-                <InfoBox
-                  label="Выбранная дата"
-                  value={selectedDateFormatted || '—'}
-                />
-                <InfoBox
-                  label="Выбранное время"
-                  value={
-                    selectedSlot
+                <div className="rounded-xl bg-muted/60 px-3.5 py-2.5">
+                  <p className="mb-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                    Дата
+                  </p>
+                  <p className="text-sm font-medium text-foreground">
+                    {selectedDateFormatted || '—'}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-muted/60 px-3.5 py-2.5">
+                  <p className="mb-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                    Время
+                  </p>
+                  <p className="text-sm font-medium text-foreground">
+                    {selectedSlot
                       ? `${dayjs(selectedSlot.startTime).format('HH:mm')} – ${dayjs(selectedSlot.endTime).format('HH:mm')}`
-                      : 'Время не выбрано'
-                  }
-                />
+                      : '—'}
+                  </p>
+                </div>
               </div>
-            </Card>
+            </div>
 
             <CalendarGrid
               currentDate={calendarMonth}
@@ -193,121 +202,112 @@ export default function BookingPage() {
                 setSelectedDate(d);
                 setSelectedSlot(null);
               }}
-              onPrevMonth={() =>
-                setCalendarMonth((m) => m.subtract(1, 'month'))
-              }
+              onPrevMonth={() => setCalendarMonth((m) => m.subtract(1, 'month'))}
               onNextMonth={() => setCalendarMonth((m) => m.add(1, 'month'))}
             />
 
-            <Card className="w-full bg-white p-5 lg:w-72 lg:shrink-0">
-              <h4 className="mb-4 text-base font-semibold text-slate-900">
-                Статус слотов
+            <div className="w-full rounded-2xl border border-border/60 bg-white p-5 shadow-sm lg:w-64 lg:shrink-0">
+              <h4 className="mb-4 text-sm font-semibold text-foreground">
+                {selectedDate ? selectedDateFormatted : 'Выберите дату'}
               </h4>
+
               <div className="space-y-2">
                 {slotsForDate.length > 0 ? (
                   slotsForDate.map((slot) => {
-                    const isSelected =
-                      selectedSlot?.startTime === slot.startTime;
+                    const isSelected = selectedSlot?.startTime === slot.startTime;
                     return (
                       <button
                         type="button"
                         key={slot.startTime}
                         data-testid={`slot-${slot.startTime}`}
                         data-available={slot.isAvailable}
-                        onClick={() =>
-                          slot.isAvailable && setSelectedSlot(slot)
-                        }
+                        onClick={() => slot.isAvailable && setSelectedSlot(slot)}
                         disabled={!slot.isAvailable}
                         className={cn(
-                          'flex w-full items-center justify-between rounded-lg border px-3 py-2 transition-all',
+                          'flex w-full items-center justify-between rounded-xl border px-3.5 py-2.5 text-sm transition-all',
                           isSelected
-                            ? 'border-orange-500 bg-orange-50'
-                            : 'border-slate-200 bg-slate-100',
-                          slot.isAvailable
-                            ? 'cursor-pointer hover:border-slate-300'
-                            : 'cursor-not-allowed opacity-60',
+                            ? 'border-primary bg-accent text-accent-foreground shadow-sm shadow-primary/10'
+                            : slot.isAvailable
+                              ? 'border-border/60 bg-muted/40 hover:border-primary/40 hover:bg-accent/50 cursor-pointer'
+                              : 'cursor-not-allowed border-border/40 bg-muted/20 opacity-50',
                         )}
                       >
-                        <span
-                          className={cn(
-                            'text-sm font-medium',
-                            slot.isAvailable
-                              ? 'text-slate-900'
-                              : 'text-muted-foreground',
-                          )}
-                        >
+                        <span className="font-medium">
                           {dayjs(slot.startTime).format('HH:mm')} –{' '}
                           {dayjs(slot.endTime).format('HH:mm')}
                         </span>
                         <span
                           className={cn(
-                            'text-xs font-semibold',
-                            slot.isAvailable
-                              ? 'text-slate-900'
-                              : 'text-muted-foreground',
+                            'flex items-center gap-1 text-xs font-semibold',
+                            isSelected
+                              ? 'text-primary'
+                              : slot.isAvailable
+                                ? 'text-emerald-600'
+                                : 'text-muted-foreground',
                           )}
-                          data-testid={
-                            slot.isAvailable ? 'slot-available' : 'slot-booked'
-                          }
+                          data-testid={slot.isAvailable ? 'slot-available' : 'slot-booked'}
                         >
-                          {slot.isAvailable ? 'Свободно' : 'Занято'}
+                          {isSelected && <CheckIcon className="size-3" />}
+                          {slot.isAvailable ? (isSelected ? 'Выбрано' : 'Свободно') : 'Занято'}
                         </span>
                       </button>
                     );
                   })
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Выберите дату
+                  <p className="py-6 text-center text-sm text-muted-foreground">
+                    Выберите дату на календаре
                   </p>
                 )}
               </div>
-              <hr className="my-4 border-slate-200" />
-              <div className="flex gap-2">
+
+              <div className="mt-4 border-t border-border/40 pt-4">
                 <Button
-                  variant="outline"
-                  className="flex-1 font-semibold"
-                  onClick={() => navigate('/book')}
-                >
-                  Назад
-                </Button>
-                <Button
-                  className="flex-1 bg-orange-500 font-semibold text-white hover:bg-orange-600"
+                  className="w-full font-semibold text-white shadow-sm shadow-primary/20 disabled:opacity-40"
                   disabled={!selectedSlot}
                   onClick={() => setFormOpen(true)}
+                  style={selectedSlot ? {
+                    background: 'linear-gradient(135deg, oklch(0.48 0.22 280) 0%, oklch(0.52 0.2 265) 100%)',
+                  } : undefined}
                 >
                   Продолжить
                 </Button>
               </div>
-            </Card>
+            </div>
           </div>
         )}
 
         <Dialog open={formOpen} onOpenChange={setFormOpen}>
-          <DialogContent>
+          <DialogContent className="rounded-2xl">
             <DialogHeader>
-              <DialogTitle>Данные для записи</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-lg font-bold">Данные для записи</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
                 Заполните контактные данные, чтобы подтвердить бронирование.
               </DialogDescription>
             </DialogHeader>
-            <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-4 pt-1" onSubmit={handleSubmit}>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="booking-guest-name">Имя</Label>
+                <Label htmlFor="booking-guest-name" className="text-sm font-medium">
+                  Имя
+                </Label>
                 <Input
                   id="booking-guest-name"
                   value={guestName}
                   onChange={(e) => setGuestName(e.target.value)}
                   placeholder="Ваше имя"
+                  className="rounded-xl"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="booking-guest-email">Email</Label>
+                <Label htmlFor="booking-guest-email" className="text-sm font-medium">
+                  Email
+                </Label>
                 <Input
                   id="booking-guest-email"
                   type="email"
                   value={guestEmail}
                   onChange={(e) => setGuestEmail(e.target.value)}
                   placeholder="email@example.com"
+                  className="rounded-xl"
                 />
               </div>
               {formError && (
@@ -315,8 +315,11 @@ export default function BookingPage() {
               )}
               <Button
                 type="submit"
-                className="bg-orange-500 font-semibold text-white hover:bg-orange-600"
+                className="w-full rounded-xl font-semibold text-white shadow-sm shadow-primary/20"
                 disabled={createBooking.isPending}
+                style={{
+                  background: 'linear-gradient(135deg, oklch(0.48 0.22 280) 0%, oklch(0.52 0.2 265) 100%)',
+                }}
               >
                 {createBooking.isPending ? 'Бронируем...' : 'Забронировать'}
               </Button>

@@ -5,21 +5,25 @@ import { cn } from '@/lib/utils';
 export default function Layout() {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto flex h-15 items-center justify-between px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <CalendarDaysIcon className="size-5 text-orange-500" />
-            <span className="text-base font-bold">Calendar</span>
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-white/80 backdrop-blur-md">
+        <div className="container mx-auto flex h-14 items-center justify-between px-6">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-primary shadow-sm">
+              <CalendarDaysIcon className="size-4 text-white" />
+            </div>
+            <span className="text-sm font-semibold tracking-tight text-foreground">
+              Calendar
+            </span>
           </Link>
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-1">
             <NavLink
               to="/book"
               className={({ isActive }) =>
                 cn(
-                  'text-sm transition-colors',
+                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                   isActive
-                    ? 'text-orange-500 font-medium'
-                    : 'text-muted-foreground hover:text-foreground',
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )
               }
             >
@@ -29,10 +33,10 @@ export default function Layout() {
               to="/admin"
               className={({ isActive }) =>
                 cn(
-                  'text-sm transition-colors',
+                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                   isActive
-                    ? 'text-orange-500 font-medium'
-                    : 'text-muted-foreground hover:text-foreground',
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )
               }
             >
