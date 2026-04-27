@@ -1,45 +1,54 @@
-FROM node:20-bookworm
+# Stage 1: Build frontend
+FROM node:20-alpine AS frontend-builder
 
-RUN apt-get update && \
-    apt-get install -y postgresql postgresql-client && \
-    rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-WORKDIR /project
+COPY frontend/package.json frontend/package-lock.json* ./
+RUN npm install
 
-COPY backend/package*.json ./backend/
-RUN cd backend && npm ci
+COPY frontend/tsconfig.json frontend/tsconfig.app.json frontend/tsconfig.node.json ./
+COPY frontend/vite.config.ts frontend/index.html ./
+COPY frontend/src/ src/
+COPY frontend/public/ public/
 
-COPY frontend/package*.json ./frontend/
-RUN cd frontend && npm ci
+RUN npm run build
 
-COPY e2e/package*.json ./e2e/
-RUN cd e2e && npm install
+# Stage 2: Build backend
+FROM node:20-alpine AS backend-builder
 
-COPY . .
+WORKDIR /app
 
-RUN cd backend && npm run build
+COPY backend/package.json backend/package-lock.json* ./
+RUN npm ci
 
-ARG POSTGRES_USER=booking
-ARG POSTGRES_PASSWORD=booking
-ARG POSTGRES_DB=booking
-ARG POSTGRES_PORT=5432
-ARG BACKEND_PORT=3000
-ARG PORT=5001
-ARG VITE_API_URL=http://localhost:3000
+COPY backend/tsconfig.json backend/tsconfig.build.json backend/nest-cli.json ./
+COPY backend/src/ src/
 
-ENV POSTGRES_USER=${POSTGRES_USER}
-ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-ENV POSTGRES_DB=${POSTGRES_DB}
-ENV POSTGRES_PORT=${POSTGRES_PORT}
-ENV DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}
-ENV BACKEND_PORT=${BACKEND_PORT}
+RUN npm run build
+
+# Stage 3: Production
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+ARG PORT=3000
+ARG DATABASE_URL
+ARG ALLOWED_ORIGINS
+
 ENV PORT=${PORT}
-ENV VITE_API_URL=${VITE_API_URL}
-ENV ALLOWED_ORIGINS=http://localhost:${PORT},http://localhost:4173
+ENV DATABASE_URL=${DATABASE_URL}
+ENV ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
 
-EXPOSE ${BACKEND_PORT} ${PORT}
+# Install production dependencies only
+COPY backend/package.json backend/package-lock.json* ./
+RUN npm ci --omit=dev
 
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+# Copy built backend
+COPY --from=backend-builder /app/dist ./dist
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+# Copy built frontend
+COPY --from=frontend-builder /app/dist ./public
+
+EXPOSE ${PORT}
+
+CMD ["node", "dist/main"]
