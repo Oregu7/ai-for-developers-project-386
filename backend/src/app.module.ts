@@ -27,6 +27,7 @@ import { Owner, EventType, Slot, Booking } from './entities/index.js';
         synchronize: true,
         autoLoadEntities: true,
         retryAttempts: 0,
+        manualInitialization: true,
         connectTimeoutMS: 10000,
         extra: {
           connectionTimeoutMillis: 10000,
