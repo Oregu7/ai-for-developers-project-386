@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Главная страница', () => {
   test('отображает главную страницу с CTA-кнопкой', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Calendar' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Записывайтесь/ })).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'Записаться' }).first(),
     ).toBeVisible();

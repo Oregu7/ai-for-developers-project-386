@@ -52,6 +52,9 @@ export function CalendarGrid({
 
   return (
     <div className="flex-1 min-w-[280px] rounded-2xl border border-border/60 bg-white p-5 shadow-sm">
+      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        Календарь
+      </h3>
       <div className="mb-5 flex items-center justify-between">
         <div>
           <h4 className="text-base font-semibold text-foreground">
@@ -122,12 +125,12 @@ export function CalendarGrid({
                     getAvailabilityColor(info.available, info.total),
                   )}
                 >
-                  {info.available}
+                  {info.available} св.
                 </span>
               )}
               {info && isSelected && (
                 <span className="mt-0.5 text-[9px] font-semibold leading-none text-primary-foreground/70">
-                  {info.available}
+                  {info.available} св.
                 </span>
               )}
             </button>
